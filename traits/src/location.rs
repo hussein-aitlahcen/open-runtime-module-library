@@ -83,7 +83,21 @@ pub trait RelativeLocations {
 
 impl RelativeLocations for MultiLocation {
 	fn sibling_parachain_general_key(para_id: u32, general_key: WeakBoundedVec<u8, ConstU32<32>>) -> MultiLocation {
-		MultiLocation::new(1, X2(Parachain(para_id), GeneralKey(general_key)))
+		MultiLocation::new(
+			1,
+			X2(
+				Parachain(para_id),
+				GeneralKey(
+					[general_key.as_ref(), &[0u8; 32][..]]
+						.concat()
+						.into_iter()
+						.take(32)
+						.collect::<Vec<_>>()
+						.try_into()
+						.expect("impossible"),
+				),
+			),
+		)
 	}
 }
 
